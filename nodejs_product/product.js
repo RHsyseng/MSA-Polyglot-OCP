@@ -19,22 +19,6 @@ console.log('!!!!!!!!!!!!!!!!!!!!!!dbPassword ' + dbPassword);
 
 
 
-
-app.get('/', function(req, res) {
-	var result = [
-	  { status : "test worked"}
-	];
-  res.json(result);
-});
-
-app.get('/product/version', function(req, res) {
-	var result = [
-	  { version : "1"}
-	];
-  res.json(result);
-});
-
-
 //get either featured products or products with keyword
 app.get('/product/products', function(req, httpRes) {
 
