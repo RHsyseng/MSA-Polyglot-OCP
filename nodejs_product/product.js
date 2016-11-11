@@ -98,13 +98,9 @@ app.get('/product/products/:sku', function(req, httpRes) {
 	  }
 	});
 
-	console.log('!!!!!!!!!!!here222');
 	dbconn.query('select sku, availability, description, featured=1 as featured, height, image, length, name, price, weight, width from Product where SKU = ? ', req.params.sku, function(err, records){
-		console.log('!!!!!!!!!!!here33' + records[0]);
 	  if(err) throw err;
-	console.log('!!!!!!!!!!!here33');
 	  httpRes.json(records[0]);
-	console.log('!!!!!!!!!!!here44');
 	});
 
 	dbconn.end(function(err) {
@@ -173,7 +169,6 @@ app.post('/product/products', function(req, httpRes) {
 app.post('/product/reduce', function(req, httpRes) {
 
 	var array = req.body.length;
-	console.log('!!!!!!!!!!!!!reduce array length: ' + req.body.length);
 
 
 	var dbconn = mysql.createConnection({
@@ -199,11 +194,8 @@ app.post('/product/reduce', function(req, httpRes) {
 		var sqlStr = 'update Product set availability = availability - ' + tmpQuantity + ' where sku = ' + tmpSku + ' and availability - ' + tmpQuantity + ' > 0'; 
 
 		dbconn.query(sqlStr, function(err, result){
-			if(err)  { 
-				console.log('!!!!!!!!!!err ' + err);
-				throw err;
+			if(err) throw err;
 
-			}
 		  	if (result.affectedRows > 0) {
 				console.log('reduced from Product ' + result.affectedRows + ' rows');
 		  	} else {
@@ -247,33 +239,52 @@ app.delete('/product/products/:sku', function(req, httpRes) {
 	  }
 	});
 
-	dbconn.query('DELETE FROM PRODUCT_KEYWORD where SKU = ?', req.params.sku, function(err, result){
-	  if(err) throw err;
+
+	/* Begin transaction */
+	dbconn.beginTransaction(function(err) {
+	  	if (err) { throw err; }
+	  	dbconn.query('DELETE FROM PRODUCT_KEYWORD where SKU = ?', req.params.sku, function(err, result){
+	    		if (err) { 
+	      			dbconn.rollback(function() {
+				throw err;
+	      			});
+	    		}
 		console.log('deleted from PRODUCT_KEYWORD ' + result.affectedRows + ' rows');
+	 
+		dbconn.query('DELETE FROM Product where SKU = ?', req.params.sku, function(err, result){
+	      		if (err) { 
+				dbconn.rollback(function() {
+		  		throw err;
+				});
+	      		}  
+			console.log('deleted from Product ' + result.affectedRows + ' rows');
+		      	dbconn.commit(function(err) {
+		      		if (err) { 
+					dbconn.rollback(function() {
+			  		throw err;
+					});
+		      		}  
+				console.log('Transaction Complete.');
+	  			httpRes.json('deleted from both Product and PRODUCT_KEYWORD tables in one transcation');
+				dbconn.end(function(err) {
+				    console.log('Database connection is end');
+				});
+		      	}); //end commit
+	    	}); //end 2nd query
+	  }); //end 1st query
 	});
+	/* End transaction */
 
-	dbconn.query('DELETE FROM Product where SKU = ?', req.params.sku, function(err, result){
-	  if(err) throw err;
-		console.log('deleted from Product ' + result.affectedRows + ' rows');
-	});
-
-  	httpRes.json('deleted from both Product and PRODUCT_KEYWORD tables');
-
-	dbconn.end(function(err) {
-	    console.log('Database connection is end');
-	});
 
 });
 
 //put (update) based on sku #
 app.put('/product/products/:sku', function(req, res) {
-	console.log('!!!!!!!!!!calling put method');
 	updateProduct(req.params.sku, req, res);
 });
 
 //patch (update) based on sku #
 app.patch('/product/products/:sku', function(req, res) {
-	console.log('!!!!!!!!!!!calling patch method');
 	updateProduct(req.params.sku, req, res);
 });
 
