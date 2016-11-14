@@ -117,32 +117,45 @@ app.post('/product/products', function(req, httpRes) {
 	  }
 	});
 
-	var record= { DESCRIPTION: req.body.DESCRIPTION, HEIGHT: req.body.HEIGHT, LENGTH: req.body.LENGTH,  NAME: req.body.NAME, WEIGHT: req.body.WEIGHT, WIDTH: req.body.WIDTH, FEATURED: req.body.FEATURED, AVAILABILITY: req.body.AVAILABILITY, IMAGE: req.body.IMAGE, PRICE: req.body.PRICE};
 
+	/* Begin transaction */
+	dbconn.beginTransaction(function(err) {
+	  	if (err) { throw err; }
 
-	dbconn.query('INSERT INTO Product SET ?', record, function(err,dbRes){
-		if(err) throw err;
-		console.log('Last record insert into Product table, SKU:', dbRes.insertId);
-		var sku = dbRes.insertId;
+		var record= { DESCRIPTION: req.body.DESCRIPTION, HEIGHT: req.body.HEIGHT, LENGTH: req.body.LENGTH,  NAME: req.body.NAME, WEIGHT: req.body.WEIGHT, WIDTH: req.body.WIDTH, FEATURED: req.body.FEATURED, 	AVAILABILITY: req.body.AVAILABILITY, IMAGE: req.body.IMAGE, PRICE: req.body.PRICE};
 
-		record = {KEYWORD: req.body.IMAGE, SKU: dbRes.insertId};
-		dbconn.query('INSERT INTO PRODUCT_KEYWORD SET ?', record, function(err,dbRes){
-			if(err) {throw err;}
-			else {
+		dbconn.query('INSERT INTO Product SET ?', record, function(err,dbRes){
+	    		if (err) { 
+	      			dbconn.rollback(function() {
+				throw err;
+	      			});
+	    		}
+			console.log('INSERT INTO Product ' + dbRes.insertId);
+	 		record = {KEYWORD: req.body.IMAGE, SKU: dbRes.insertId};
+
+			dbconn.query('INSERT INTO PRODUCT_KEYWORD SET ?', record, function(err,dbRes){
+		      		if (err) { 
+					dbconn.rollback(function() {
+			  		throw err;
+					});
+		      		}  
 				console.log('record insert into PRODUCT_KEYWORD table');
-				result = [
-				  { status : "SUCCESS",
-				  SKU : sku}
-				];
-				httpRes.json(result);
-			}
-
-			dbconn.end(function(err) {
-			    console.log('Database connection is end');
-			});
-
-		});
+			      	dbconn.commit(function(err) {
+			      		if (err) { 
+						dbconn.rollback(function() {
+				  		throw err;
+						});
+		      			}  
+				console.log('Transaction Complete.');
+	  			httpRes.json('inserted into both Product and PRODUCT_KEYWORD tables in one transcation ');
+				dbconn.end(function(err) {
+				    console.log('Database connection is end');
+				});
+		      		}); //end commit
+	    		}); //end 2nd query
+	  	}); //end 1st query
 	});
+	/* End transaction */
 
 
 
