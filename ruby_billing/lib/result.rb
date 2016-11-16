@@ -2,7 +2,6 @@ class Result
 
   attr_accessor :status, :name, :orderNumber, :transactionDate, :transactionNumber
 
-
 def to_json(*a)
   {
     	'status'   => @status,
@@ -12,6 +11,5 @@ def to_json(*a)
 	'transactionNumber' => @transactionNumber
   }.to_json(*a)
 end
-
     
 end
