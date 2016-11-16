@@ -45,7 +45,6 @@ app.get('/product/products', function(req, httpRes) {
 	if (req.query.featured != null) {
 
 		dbconn.query('select sku, availability, description, featured=1 as featured, height, image, length, name, price, weight, width from Product where featured=true', function(err, records){
-//		dbconn.query('SELECT * FROM Product where featured=true', function(err, records){
 		  if(err) throw err;
 		  httpRes.json(records);
 		});
