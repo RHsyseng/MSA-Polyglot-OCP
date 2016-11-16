@@ -8,17 +8,31 @@ Bundler.require(:default)
 class Application < Sinatra::Base
 
 
-before do
-	content_type 'application/json'
+  before do
+    content_type 'application/json'
+  end
+
+
+  get '/' do
+    ENV.inspect
+  end
+
+get '/billing/process' do
+  "please use post method on url/process to handle credit card transaction"
+end
+
+
+
+
+
+
+get '/billing/refund/:transactionNumber' do
+	"refund for '#{params[:transactionNumber]}'"
 end
 
 
 post '/billing/refund/:id' do
 	"refund for transcation number #{params[:id]}"
-end
-
-get '/billing/process' do
-  	"please use post method on url/process to handle credit card transaction"
 end
 
 post '/billing/process' do
