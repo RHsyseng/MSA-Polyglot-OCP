@@ -23,7 +23,7 @@ end
 post '/billing/process' do
   	post_data =  JSON.parse request.body.read
   	if post_data.nil? or !post_data.has_key?('creditCardNumber')  or !post_data.has_key?('verificationCode')
-   		puts "ERROR, no credit Card Number or verificatoin Code !"
+   		puts "ERROR, no credit Card Number2 or verificatoin Code !"
 	else
 	   	transcation = Transcation.new 
 		transcation.creditCardNumber = post_data['creditCardNumber']
@@ -57,6 +57,11 @@ post '/billing/process' do
 
 		result.to_json
   	end
+end
+
+
+
+
 end
 
 run Application
