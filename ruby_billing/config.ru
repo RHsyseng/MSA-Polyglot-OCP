@@ -8,26 +8,14 @@ Bundler.require(:default)
 class Application < Sinatra::Base
 
 
-  before do
-    content_type 'application/json'
-  end
-
-
-  get '/' do
-    ENV.inspect
-  end
-
-get '/billing/process' do
-  "please use post method on url/process to handle credit card transaction puma"
+before do
+	content_type 'application/json'
 end
 
 
 
-
-
-
-get '/billing/refund/:transactionNumber' do
-	"refund for '#{params[:transactionNumber]}'"
+get '/billing/process' do
+  	"please use post method on url/process to handle credit card transaction 2"
 end
 
 
@@ -36,10 +24,9 @@ post '/billing/refund/:id' do
 end
 
 post '/billing/process' do
- begin
   post_data =  JSON.parse request.body.read
   if post_data.nil? or !post_data.has_key?('creditCardNumber')  or !post_data.has_key?('verificationCode')
-   puts "ERROR, no CC# or verificatoinCode!!!!!!!!"
+   	puts "ERROR, no credit card number or verificatoin code!"
   else
    	transcation = Transcation.new 
 	transcation.creditCardNumber = post_data['creditCardNumber']
@@ -72,14 +59,8 @@ post '/billing/process' do
 	end
 
 	result.to_json
-
-  end
  end
 end
 
-
-
-
-end
 
 run Application
