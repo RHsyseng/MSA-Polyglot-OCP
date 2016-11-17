@@ -8,28 +8,13 @@ Bundler.require(:default)
 class Application < Sinatra::Base
 
 
-  before do
-    content_type 'application/json'
-  end
-
-
-  get '/' do
-    ENV.inspect
-  end
+before do
+	content_type 'application/json'
+end
 
 get '/billing/process' do
-  "please use post method on url/process to handle credit card transaction"
+  "please use post method on url/process to handle credit card transaction2"
 end
-
-
-
-
-
-
-get '/billing/refund/:transactionNumber' do
-	"refund for '#{params[:transactionNumber]}'"
-end
-
 
 post '/billing/refund/:id' do
 	"refund for transcation number #{params[:id]}"
@@ -39,7 +24,7 @@ post '/billing/process' do
  begin
   post_data =  JSON.parse request.body.read
   if post_data.nil? or !post_data.has_key?('creditCardNumber')  or !post_data.has_key?('verificationCode')
-   puts "ERROR, no CC# or verificatoinCode!!!!!!!!"
+   	puts "ERROR, no credit Card Number or verification Code !"
   else
    	transcation = Transcation.new 
 	transcation.creditCardNumber = post_data['creditCardNumber']
@@ -51,13 +36,13 @@ post '/billing/process' do
 	transcation.orderNumber = post_data['orderNumber']
 	transcation.amount = post_data['amount']
 
-	  puts "creditCardNumber  #{transcation.creditCardNumber}"
-	  puts "expMonth          #{transcation.expMonth}"
-	  puts "expYear           #{transcation.expYear}"
-	  puts "billingAddress    #{transcation.billingAddress}"
-	  puts "customerName      #{transcation.customerName}"
-	  puts "orderNumber       #{transcation.orderNumber}"
-	  puts "amount            #{transcation.amount}"
+	puts "creditCardNumber  #{transcation.creditCardNumber}"
+	puts "expMonth          #{transcation.expMonth}"
+	puts "expYear           #{transcation.expYear}"
+	puts "billingAddress    #{transcation.billingAddress}"
+	puts "customerName      #{transcation.customerName}"
+	puts "orderNumber       #{transcation.orderNumber}"
+	puts "amount            #{transcation.amount}"
 
 	result = Result.new
 	result.name = transcation.customerName
