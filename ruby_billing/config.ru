@@ -13,7 +13,7 @@ before do
 end
 
 get '/billing/process' do
-  "please use post method on url/process to handle credit card transaction2"
+  "please use post method on url/process to handle credit card transaction3"
 end
 
 post '/billing/refund/:id' do
@@ -21,7 +21,6 @@ post '/billing/refund/:id' do
 end
 
 post '/billing/process' do
- begin
   post_data =  JSON.parse request.body.read
   if post_data.nil? or !post_data.has_key?('creditCardNumber')  or !post_data.has_key?('verificationCode')
    	puts "ERROR, no credit Card Number or verification Code !"
@@ -60,11 +59,6 @@ post '/billing/process' do
 
   end
  end
-end
-
-
-
-
 end
 
 run Application
