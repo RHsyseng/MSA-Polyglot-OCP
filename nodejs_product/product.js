@@ -89,16 +89,43 @@ app.get('/product/products/:sku', function(req, httpRes) {
 
 });
 
+//add keyword through post 
+app.post('/product/keywords', function(req, httpRes) {
+
+	var dbconn = mysql.createConnection({
+	  host     : dbHost,
+	  user     : dbUser,
+	  password : dbPassword,
+	  database : dbDatabase
+	});
+	dbconn.connect(function(err){
+	  if(err){
+	    console.log('Database connection error');
+	  }else{
+	    console.log('Database connection successful');
+	  }
+	});
+
+	var record= { KEYWORD: req.body.keyword};
+
+	dbconn.query('INSERT INTO Keyword SET ?', record, function(err,dbRes){
+	  if(err) throw err;
+		var result = {
+			keyword : req.body.keyword,
+  			products : null}
+
+	  httpRes.json(result);
+	});
+
+	dbconn.end(function(err) {
+	    console.log('Database connection is end');
+	});
+
+});
+
 
 //add product through post 
 app.post('/product/products', function(req, httpRes) {
-
-
-//	if(!req.body.hasOwnProperty('DESCRIPTION') || !req.body.hasOwnProperty('NAME')) {
-//		httpRes.statusCode = 400;
-//		return httpRes.send('Error 400: need to have valid DESCRIPTION and NAME.');
-//	}
-
 	var dbconn = mysql.createConnection({
 	  host     : dbHost,
 	  user     : dbUser,
@@ -119,17 +146,7 @@ app.post('/product/products', function(req, httpRes) {
 	/* Begin transaction */
 	dbconn.beginTransaction(function(err) {
 	  	if (err) { throw err; }
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.description2' + req.body.description);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.height' + req.body.height);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.length' + req.body.length);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.name' + req.body.name);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.weight' + req.body.weight);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.width' + req.body.width);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.featured' + req.body.featured);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.availability' + req.body.availability);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.image' + req.body.image);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.price' + req.body.price);
-	    console.log('!!!!!!!!!!!!!!!!!------------------------------------- ');
+
 		var featured = 0;
 		if (req.body.featured = 'true') 
 			featured = 1;
@@ -142,10 +159,8 @@ app.post('/product/products', function(req, httpRes) {
 				throw err;
 	      			});
 	    		}
-			console.log('INSERT INTO Product ' + dbRes.insertId);
-			console.log('!!!!!!!!!!!!!!!here 3' + dbRes.insertId);
+
 			var tmpSku = dbRes.insertId;
-			console.log('INSERT INTO Product ' + tmpSku);
 	 		record = {KEYWORD: req.body.image, SKU: tmpSku};
 
 			dbconn.query('INSERT INTO PRODUCT_KEYWORD SET ?', record, function(err,dbRes){
