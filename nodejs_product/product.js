@@ -119,19 +119,19 @@ app.post('/product/products', function(req, httpRes) {
 	/* Begin transaction */
 	dbconn.beginTransaction(function(err) {
 	  	if (err) { throw err; }
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.DESCRIPTION' + req.body.DESCRIPTION);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.HEIGHT' + req.body.HEIGHT);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.LENGTH' + req.body.LENGTH);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.NAME' + req.body.NAME);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.WEIGHT' + req.body.WEIGHT);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.WIDTH' + req.body.WIDTH);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.FEATURED' + req.body.FEATURED);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.AVAILABILITY' + req.body.AVAILABILITY);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.IMAGE' + req.body.IMAGE);
-	    console.log('!!!!!!!!!!!!!!!!!here req.body.PRICE' + req.body.PRICE);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.description2' + req.body.description);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.height' + req.body.height);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.length' + req.body.length);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.name' + req.body.name);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.weight' + req.body.weight);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.width' + req.body.width);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.featured' + req.body.featured);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.availability' + req.body.availability);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.image' + req.body.image);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.price' + req.body.price);
 	    console.log('!!!!!!!!!!!!!!!!!------------------------------------- ');
 
-		var record= { DESCRIPTION: req.body.DESCRIPTION, HEIGHT: req.body.HEIGHT, LENGTH: req.body.LENGTH,  NAME: req.body.NAME, WEIGHT: req.body.WEIGHT, WIDTH: req.body.WIDTH, FEATURED: req.body.FEATURED, 	AVAILABILITY: req.body.AVAILABILITY, IMAGE: req.body.IMAGE, PRICE: req.body.PRICE};
+		var record= { DESCRIPTION: req.body.description, HEIGHT: req.body.height, LENGTH: req.body.length,  NAME: req.body.name, WEIGHT: req.body.weight, WIDTH: req.body.width, FEATURED: req.body.featured, 	AVAILABILITY: req.body.availability, IMAGE: req.body.image, PRICE: req.body.price};
 
 		dbconn.query('INSERT INTO Product SET ?', record, function(err,dbRes){
 	    		if (err) { 
