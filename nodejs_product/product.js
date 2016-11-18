@@ -130,8 +130,11 @@ app.post('/product/products', function(req, httpRes) {
 	    console.log('!!!!!!!!!!!!!!!!!here req.body.image' + req.body.image);
 	    console.log('!!!!!!!!!!!!!!!!!here req.body.price' + req.body.price);
 	    console.log('!!!!!!!!!!!!!!!!!------------------------------------- ');
+		var featured = 0;
+		if (req.body.featured = 'true') 
+			featured = 1;
 
-		var record= { DESCRIPTION: req.body.description, HEIGHT: req.body.height, LENGTH: req.body.length,  NAME: req.body.name, WEIGHT: req.body.weight, WIDTH: req.body.width, FEATURED: req.body.featured, 	AVAILABILITY: req.body.availability, IMAGE: req.body.image, PRICE: req.body.price};
+		var record= { DESCRIPTION: req.body.description, HEIGHT: req.body.height, LENGTH: req.body.length,  NAME: req.body.name, WEIGHT: req.body.weight, WIDTH: req.body.width, FEATURED: featured, 	AVAILABILITY: req.body.availability, IMAGE: req.body.image, PRICE: req.body.price};
 
 		dbconn.query('INSERT INTO Product SET ?', record, function(err,dbRes){
 	    		if (err) { 
@@ -139,8 +142,10 @@ app.post('/product/products', function(req, httpRes) {
 				throw err;
 	      			});
 	    		}
+			console.log('INSERT INTO Product ' + dbRes.insertId);
+			console.log('!!!!!!!!!!!!!!!here 3' + dbRes.insertId);
 			var tmpSku = dbRes.insertId;
-			console.log('INSERT INTO Product ' tmpSku);
+			console.log('INSERT INTO Product ' + tmpSku);
 	 		record = {KEYWORD: req.body.image, SKU: tmpSku};
 
 			dbconn.query('INSERT INTO PRODUCT_KEYWORD SET ?', record, function(err,dbRes){
@@ -161,7 +166,7 @@ app.post('/product/products', function(req, httpRes) {
 				var result = [
 				  	{ 	
 					sku : tmpSku,
-				  	name : nullreq.body.name,
+				  	name : req.body.name,
 					description : req.body.description,
 					length : req.body.length,
 					width : req.body.width, 
