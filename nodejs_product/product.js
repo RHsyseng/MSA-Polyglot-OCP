@@ -89,6 +89,7 @@ app.get('/product/products/:sku', function(req, httpRes) {
 
 });
 
+
 //add keyword through post 
 app.post('/product/keywords', function(req, httpRes) {
 
@@ -255,6 +256,14 @@ app.post('/product/reduce', function(req, httpRes) {
 
 	return httpRes.send('');;
 });
+
+//classify method for adding demo
+app.post('/product/classify/:sku', function(req, httpRes) {
+	console.log( "Asked to classify " + req.params.sku );
+	  httpRes.json('');
+});
+
+
 
 //delete based on sku #
 app.delete('/product/products/:sku', function(req, httpRes) {
