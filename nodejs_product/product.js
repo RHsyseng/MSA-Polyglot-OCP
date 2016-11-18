@@ -92,10 +92,12 @@ app.get('/product/products/:sku', function(req, httpRes) {
 
 //add product through post 
 app.post('/product/products', function(req, httpRes) {
-	if(!req.body.hasOwnProperty('DESCRIPTION') || !req.body.hasOwnProperty('NAME')) {
-		httpRes.statusCode = 400;
-		return httpRes.send('Error 400: need to have valid DESCRIPTION and NAME.');
-	}
+
+
+//	if(!req.body.hasOwnProperty('DESCRIPTION') || !req.body.hasOwnProperty('NAME')) {
+//		httpRes.statusCode = 400;
+//		return httpRes.send('Error 400: need to have valid DESCRIPTION and NAME.');
+//	}
 
 	var dbconn = mysql.createConnection({
 	  host     : dbHost,
