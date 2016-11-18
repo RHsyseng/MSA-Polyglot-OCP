@@ -140,7 +140,7 @@ app.post('/product/products', function(req, httpRes) {
 	      			});
 	    		}
 			console.log('INSERT INTO Product ' + dbRes.insertId);
-	 		record = {KEYWORD: req.body.IMAGE, SKU: dbRes.insertId};
+	 		record = {KEYWORD: req.body.image, SKU: dbRes.insertId};
 
 			dbconn.query('INSERT INTO PRODUCT_KEYWORD SET ?', record, function(err,dbRes){
 		      		if (err) { 
