@@ -58,9 +58,6 @@ app.get('/product/products', function(req, httpRes) {
 	dbconn.end(function(err) {
 	    console.log('Database connection is end');
 	});
-
-
-
 });
 
 
@@ -155,10 +152,6 @@ app.post('/product/products', function(req, httpRes) {
 	  	}); //end 1st query
 	});
 	/* End transaction */
-
-
-
-
 });
 
 //reduce product through post, this is for the checkout process 
@@ -185,8 +178,6 @@ app.post('/product/reduce', function(req, httpRes) {
 
 		var tmpSku = req.body[i]['sku'];
 		var tmpQuantity = req.body[i]['quantity'];
-	    	console.log('!!!!!!!!!!!!!reduce sku ' + tmpSku.toString());
-	    	console.log('!!!!!!!!!!!!!reduce quantity ' + tmpQuantity.toString());
 		var sqlStr = 'update Product set availability = availability - ' + tmpQuantity + ' where sku = ' + tmpSku + ' and availability - ' + tmpQuantity + ' > 0'; 
 
 		dbconn.query(sqlStr, function(err, result){
@@ -214,8 +205,6 @@ app.post('/product/reduce', function(req, httpRes) {
 	});
 
 	return httpRes.send('');;
-
-
 });
 
 //delete based on sku #
@@ -270,8 +259,6 @@ app.delete('/product/products/:sku', function(req, httpRes) {
 	  }); //end 1st query
 	});
 	/* End transaction */
-
-
 });
 
 //put (update) based on sku #
