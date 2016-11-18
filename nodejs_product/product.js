@@ -117,6 +117,17 @@ app.post('/product/products', function(req, httpRes) {
 	/* Begin transaction */
 	dbconn.beginTransaction(function(err) {
 	  	if (err) { throw err; }
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.DESCRIPTION' + req.body.DESCRIPTION);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.HEIGHT' + req.body.HEIGHT);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.LENGTH' + req.body.LENGTH);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.NAME' + req.body.NAME);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.WEIGHT' + req.body.WEIGHT);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.WIDTH' + req.body.WIDTH);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.FEATURED' + req.body.FEATURED);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.AVAILABILITY' + req.body.AVAILABILITY);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.IMAGE' + req.body.IMAGE);
+	    console.log('!!!!!!!!!!!!!!!!!here req.body.PRICE' + req.body.PRICE);
+	    console.log('!!!!!!!!!!!!!!!!!------------------------------------- ');
 
 		var record= { DESCRIPTION: req.body.DESCRIPTION, HEIGHT: req.body.HEIGHT, LENGTH: req.body.LENGTH,  NAME: req.body.NAME, WEIGHT: req.body.WEIGHT, WIDTH: req.body.WIDTH, FEATURED: req.body.FEATURED, 	AVAILABILITY: req.body.AVAILABILITY, IMAGE: req.body.IMAGE, PRICE: req.body.PRICE};
 
