@@ -163,8 +163,7 @@ app.post('/product/products', function(req, httpRes) {
 		      			}  
 				console.log('inserted into both Product and PRODUCT_KEYWORD tables in one transcation ');
 
-				var result = [
-				  	{ 	
+				var result = {
 					sku : tmpSku,
 				  	name : req.body.name,
 					description : req.body.description,
@@ -176,8 +175,7 @@ app.post('/product/products', function(req, httpRes) {
 					availability : req.body.availability,
 					price : req.body.price, 
 					image : req.body.image
-					}
-				];
+					};
 
 	  			httpRes.json(result);
 				dbconn.end(function(err) {
