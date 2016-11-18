@@ -139,8 +139,9 @@ app.post('/product/products', function(req, httpRes) {
 				throw err;
 	      			});
 	    		}
-			console.log('INSERT INTO Product ' + dbRes.insertId);
-	 		record = {KEYWORD: req.body.image, SKU: dbRes.insertId};
+			var tmpSku = dbRes.insertId;
+			console.log('INSERT INTO Product ' tmpSku);
+	 		record = {KEYWORD: req.body.image, SKU: tmpSku};
 
 			dbconn.query('INSERT INTO PRODUCT_KEYWORD SET ?', record, function(err,dbRes){
 		      		if (err) { 
@@ -155,8 +156,25 @@ app.post('/product/products', function(req, httpRes) {
 				  		throw err;
 						});
 		      			}  
-				console.log('Transaction Complete.');
-	  			httpRes.json('inserted into both Product and PRODUCT_KEYWORD tables in one transcation ');
+				console.log('inserted into both Product and PRODUCT_KEYWORD tables in one transcation ');
+
+				var result = [
+				  	{ 	
+					sku : tmpSku,
+				  	name : nullreq.body.name,
+					description : req.body.description,
+					length : req.body.length,
+					width : req.body.width, 
+					height : req.body.height,
+					weight : req.body.weight,
+					featured : req.body.featured, 
+					availability : req.body.availability,
+					price : req.body.price, 
+					image : req.body.image
+					}
+				];
+
+	  			httpRes.json(result);
 				dbconn.end(function(err) {
 				    console.log('Database connection is end');
 				});
