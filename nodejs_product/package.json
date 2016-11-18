@@ -1,7 +1,7 @@
 {
   "name": "productWs",
   "version": "0.0.1",
-  "description": "Product services implemented in Node.js with mySQL",
+  "description": "Product service implemented in Node.js with mySQL",
   "main": "product.js",
   "dependencies": {
     "express": "~4.14.0",
