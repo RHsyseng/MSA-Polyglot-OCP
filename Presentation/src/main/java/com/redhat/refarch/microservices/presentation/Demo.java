@@ -35,7 +35,7 @@ public class Demo
 				Product product = getProduct( data );
 				tmpSku = tmpSku + 1;
 				List<Keyword> productKeywords = new ArrayList<>();
-				skuKeywords.put( i, productKeywords );
+				skuKeywords.put( tmpSku, productKeywords );
 				String image = product.getImage();
 				if( "TV".equals( image ) )
 				{
