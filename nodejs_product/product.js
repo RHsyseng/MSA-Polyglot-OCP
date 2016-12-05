@@ -11,13 +11,13 @@ var dbHost = process.env.MYSQL_HOST,
       dbDatabase = process.env.MYSQL_DATABASE,
       dbPassword = process.env.MYSQL_PASSWORD;
 
-if (dbHost == null) dbDatabase = 'product-db';
+if (dbHost == null) dbHost = 'product-db';
 if (dbDatabase == null) dbDatabase = 'product';
 
 console.log('!!!!!!!!!!!!!!!!!!!!!!dbUser ' + dbUser);
 console.log('!!!!!!!!!!!!!!!!!!!!!!dbPassword ' + dbPassword);
-console.log('!!!!!!!!!!!!!!!!!!!!!!dbHost ' + dbHost);
 console.log('!!!!!!!!!!!!!!!!!!!!!!dbDatabase ' + dbDatabase);
+console.log('!!!!!!!!!!!!!!!!!!!!!!dbHost ' + dbHost);
 
 
 
