@@ -26,6 +26,7 @@ public class Demo
 		{
 			//Map products to their category as you add them:
 			Map<Long, List<Keyword>> skuKeywords = new HashMap<>();
+			logInfo( "!!!!!Map products to their category as you add them:" );
 
 
 			//Get unique keywords:
@@ -34,11 +35,16 @@ public class Demo
 			{
 				keywords.addAll( entry.getValue() );
 			}
+			logInfo( "!!!!!!!!!!!!!!!!!!!!!Get unique keywords:" );
+
+
 			//Store keywords in database:
 			for( Keyword keyword : keywords )
 			{
 				RestClient.addKeyword( keyword );
 			}
+			logInfo( "!!!!!!!!!!!!!!!!!!Store keywords in database" );
+
 
 			for( String[] data : readCSV() )
 			{
