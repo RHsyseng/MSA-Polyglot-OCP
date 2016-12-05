@@ -28,7 +28,7 @@ public class Demo
 			logInfo( "!!!!!!!!!!!!!!! add keyword first, using fake sku id, since can't insert into tables yet" );
 
 			Map<Long, List<Keyword>> skuKeywords = new HashMap<>();
-			int tmpSku = 1;
+			long tmpSku = 1;
 			for( String[] data : readCSV() )
 			{
 				logInfo( "!!!!!!!!!!!!!!! tmpSku" + tmpSku);
