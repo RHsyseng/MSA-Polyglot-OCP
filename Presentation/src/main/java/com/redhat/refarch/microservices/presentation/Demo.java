@@ -28,12 +28,14 @@ public class Demo
 			logInfo( "!!!!!!!!!!!!!!! add keyword first, using fake sku id, since can't insert into tables yet" );
 
 			Map<Long, List<Keyword>> skuKeywords = new HashMap<>();
+			var tmpSku = 1;
 			for( String[] data : readCSV() )
 			{
+				logInfo( "!!!!!!!!!!!!!!! tmpSku" + tmpSku);
 				Product product = getProduct( data );
-				long sku = 123;
+				tmpSku = tmpSku + 1;
 				List<Keyword> productKeywords = new ArrayList<>();
-				skuKeywords.put( sku, productKeywords );
+				skuKeywords.put( i, productKeywords );
 				String image = product.getImage();
 				if( "TV".equals( image ) )
 				{
