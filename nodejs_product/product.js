@@ -11,6 +11,8 @@ var dbHost = process.env.MYSQL_HOST,
       dbDatabase = process.env.MYSQL_DATABASE,
       dbPassword = process.env.MYSQL_PASSWORD;
 
+if (dbHost == null) dbDatabase = 'product-db';
+if (dbDatabase == null) dbDatabase = 'product';
 
 console.log('!!!!!!!!!!!!!!!!!!!!!!dbHost ' + dbHost);
 console.log('!!!!!!!!!!!!!!!!!!!!!!dbUser ' + dbUser);
