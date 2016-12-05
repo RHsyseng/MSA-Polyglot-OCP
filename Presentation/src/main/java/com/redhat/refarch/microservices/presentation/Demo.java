@@ -25,27 +25,53 @@ public class Demo
 		if( RestClient.getFeaturedProducts().isEmpty() )
 		{
 			//Map products to their category as you add them:
+			logInfo( "!!!!!!!!!!!!!!! add keyword first, using fake sku id, since can't insert into tables yet" );
+
 			Map<Long, List<Keyword>> skuKeywords = new HashMap<>();
-			logInfo( "!!!!!Map products to their category as you add them:" );
-
-
+			for( String[] data : readCSV() )
+			{
+				Product product = getProduct( data );
+				long sku = 123;
+				List<Keyword> productKeywords = new ArrayList<>();
+				skuKeywords.put( sku, productKeywords );
+				String image = product.getImage();
+				if( "TV".equals( image ) )
+				{
+					productKeywords.add( getKeyword( "Electronics" ) );
+					productKeywords.add( getKeyword( "TV" ) );
+				}
+				else if( "Microwave".equals( image ) )
+				{
+					productKeywords.add( getKeyword( "Electronics" ) );
+					productKeywords.add( getKeyword( "Microwave" ) );
+				}
+				else if( "Laptop".equals( image ) )
+				{
+					productKeywords.add( getKeyword( "Electronics" ) );
+					productKeywords.add( getKeyword( "Laptop" ) );
+				}
+				else if( "CoffeeTable".equals( image ) )
+				{
+					productKeywords.add( getKeyword( "Furniture" ) );
+					productKeywords.add( getKeyword( "Table" ) );
+				}
+			}
 			//Get unique keywords:
 			Set<Keyword> keywords = new HashSet<>();
 			for( Entry<Long, List<Keyword>> entry : skuKeywords.entrySet() )
 			{
 				keywords.addAll( entry.getValue() );
 			}
-			logInfo( "!!!!!!!!!!!!!!!!!!!!!Get unique keywords:" );
-
-
 			//Store keywords in database:
 			for( Keyword keyword : keywords )
 			{
 				RestClient.addKeyword( keyword );
 			}
-			logInfo( "!!!!!!!!!!!!!!!!!!Store keywords in database" );
+			logInfo( "!!!!!!!!!!!!!!! add keyword finished" );
 
 
+			//Map products to their category as you add them:
+			skuKeywords = new HashMap<>();
 			for( String[] data : readCSV() )
 			{
 				Product product = getProduct( data );
@@ -74,6 +100,8 @@ public class Demo
 					productKeywords.add( getKeyword( "Table" ) );
 				}
 			}
+
+
 
 			//Classify products:
 			for( Entry<Long, List<Keyword>> entry : skuKeywords.entrySet() )
