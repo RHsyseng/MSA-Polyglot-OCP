@@ -96,7 +96,7 @@ public class Demo
 					productKeywords.add( getKeyword( "Electronics" ) );
 					productKeywords.add( getKeyword( "Laptop" ) );
 				}
-				else if( "CoffeeTable".equals( image ) )
+				else if( "Table".equals( image ) )
 				{
 					productKeywords.add( getKeyword( "Furniture" ) );
 					productKeywords.add( getKeyword( "Table" ) );
