@@ -16,8 +16,8 @@ if (dbDatabase == null) dbDatabase = 'product';
 
 console.log('!!!!!!!!!!!!!!!!!!!!!!dbHost ' + dbHost);
 console.log('!!!!!!!!!!!!!!!!!!!!!!dbUser ' + dbUser);
-console.log('!!!!!!!!!!!!!!!!!!!!!!dbDatabase ' + dbDatabase);
-console.log('!!!!!!!!!!!!!!!!!!!!!!dbPassword ' + dbPassword);
+console.log('!!!!!!!!!!!!!!!!!!!!!!!dbDatabase ' + dbDatabase);
+console.log('!!!!!!!!!!!!!!!!!!!!!!!dbPassword ' + dbPassword);
 
 
 
