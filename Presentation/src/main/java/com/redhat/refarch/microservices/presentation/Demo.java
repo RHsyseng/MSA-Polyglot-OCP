@@ -37,6 +37,7 @@ public class Demo
 				List<Keyword> productKeywords = new ArrayList<>();
 				skuKeywords.put( tmpSku, productKeywords );
 				String image = product.getImage();
+				logInfo( "!!!!!!!!!!!!!!! image" + image);
 				if( "TV".equals( image ) )
 				{
 					productKeywords.add( getKeyword( "Electronics" ) );
@@ -52,7 +53,7 @@ public class Demo
 					productKeywords.add( getKeyword( "Electronics" ) );
 					productKeywords.add( getKeyword( "Laptop" ) );
 				}
-				else if( "CoffeeTable".equals( image ) )
+				else if( "Table".equals( image ) )
 				{
 					productKeywords.add( getKeyword( "Furniture" ) );
 					productKeywords.add( getKeyword( "Table" ) );
