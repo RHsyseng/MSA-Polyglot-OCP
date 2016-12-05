@@ -26,6 +26,20 @@ public class Demo
 		{
 			//Map products to their category as you add them:
 			Map<Long, List<Keyword>> skuKeywords = new HashMap<>();
+
+
+			//Get unique keywords:
+			Set<Keyword> keywords = new HashSet<>();
+			for( Entry<Long, List<Keyword>> entry : skuKeywords.entrySet() )
+			{
+				keywords.addAll( entry.getValue() );
+			}
+			//Store keywords in database:
+			for( Keyword keyword : keywords )
+			{
+				RestClient.addKeyword( keyword );
+			}
+
 			for( String[] data : readCSV() )
 			{
 				Product product = getProduct( data );
@@ -54,17 +68,7 @@ public class Demo
 					productKeywords.add( getKeyword( "Table" ) );
 				}
 			}
-			//Get unique keywords:
-			Set<Keyword> keywords = new HashSet<>();
-			for( Entry<Long, List<Keyword>> entry : skuKeywords.entrySet() )
-			{
-				keywords.addAll( entry.getValue() );
-			}
-			//Store keywords in database:
-			for( Keyword keyword : keywords )
-			{
-				RestClient.addKeyword( keyword );
-			}
+
 			//Classify products:
 			for( Entry<Long, List<Keyword>> entry : skuKeywords.entrySet() )
 			{
