@@ -24,20 +24,17 @@ public class Demo
 	{
 		if( RestClient.getFeaturedProducts().isEmpty() )
 		{
-			//Map products to their category as you add them:
-			logInfo( "!!!!!!!!!!!!!!! add keyword first, using fake sku id, since can't insert into tables yet" );
+			//need to add keyword first, using fake sku id, since can't insert into tables yet
 
 			Map<Long, List<Keyword>> skuKeywords = new HashMap<>();
 			long tmpSku = 1;
 			for( String[] data : readCSV() )
 			{
-				logInfo( "!!!!!!!!!!!!!!! tmpSku" + tmpSku);
 				Product product = getProduct( data );
 				tmpSku = tmpSku + 1;
 				List<Keyword> productKeywords = new ArrayList<>();
 				skuKeywords.put( tmpSku, productKeywords );
 				String image = product.getImage();
-				logInfo( "!!!!!!!!!!!!!!! image" + image);
 				if( "TV".equals( image ) )
 				{
 					productKeywords.add( getKeyword( "Electronics" ) );
@@ -70,8 +67,6 @@ public class Demo
 			{
 				RestClient.addKeyword( keyword );
 			}
-			logInfo( "!!!!!!!!!!!!!!! add keyword finished" );
-
 
 			//Map products to their category as you add them:
 			skuKeywords = new HashMap<>();
