@@ -79,29 +79,6 @@ public class Demo
 			{
 				Product product = getProduct( data );
 				long sku = RestClient.addProduct( product );
-				List<Keyword> productKeywords = new ArrayList<>();
-				skuKeywords.put( sku, productKeywords );
-				String image = product.getImage();
-				if( "TV".equals( image ) )
-				{
-					productKeywords.add( getKeyword( "Electronics" ) );
-					productKeywords.add( getKeyword( "TV" ) );
-				}
-				else if( "Microwave".equals( image ) )
-				{
-					productKeywords.add( getKeyword( "Electronics" ) );
-					productKeywords.add( getKeyword( "Microwave" ) );
-				}
-				else if( "Laptop".equals( image ) )
-				{
-					productKeywords.add( getKeyword( "Electronics" ) );
-					productKeywords.add( getKeyword( "Laptop" ) );
-				}
-				else if( "Table".equals( image ) )
-				{
-					productKeywords.add( getKeyword( "Furniture" ) );
-					productKeywords.add( getKeyword( "Table" ) );
-				}
 			}
 
 
