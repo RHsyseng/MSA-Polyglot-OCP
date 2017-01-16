@@ -8,13 +8,8 @@
     "mysql": "2.11.1",
     "body-parser": "1.15.2"
   },
-  "engine": {
-    "node": "*",
-    "npm": "*"
-  },
   "scripts": {
-    "start": "node product.js",
-    "test": " "
+    "start": "node product.js"
   },
   "repository": {
     "type": "git",

@@ -4,7 +4,6 @@ var bodyParser = require('body-parser');
 
 app.use(bodyParser.json());
 
-var mysql  = require('mysql');
 
 var dbHost = process.env.MYSQL_HOST,
       dbUser = process.env.MYSQL_USER,
@@ -19,109 +18,66 @@ console.log('!!!!!!!!!!!!!!!!!!!!!!dbPassword ' + dbPassword);
 console.log('!!!!!!!!!!!!!!!!!!!!!!dbDatabase ' + dbDatabase);
 console.log('!!!!!!!!!!!!!!!!!!!!!!dbHost ' + dbHost);
 
+var mysql  = require('mysql');
+var pool = mysql.createPool({
+  connectionLimit : 5,
+  host            : dbHost,
+  user            : dbUser,
+  password        : dbPassword,
+  database        : dbDatabase
+});
 
 
 //get either featured products or products with keyword
 app.get('/product/products', function(req, httpRes) {
-
-	var dbconn = mysql.createConnection({
-	  host     : dbHost,
-	  user     : dbUser,
-	  password : dbPassword,
-	  database : dbDatabase
-	});
-	dbconn.connect(function(err){
-	  if(err){
-	    console.log('Database connection error');
-	  }else{
-	    console.log('Database connection successful');
-	  }
-	});
-
-
 	if(req.query.featured == null && req.query.keyword == null) {
 		httpRes.statusCode = 400;
 		return httpRes.send('All products cannot be returned, need to provide a search condition');
 	}
 
-	if (req.query.featured != null) {
 
-		dbconn.query('select sku, availability, description, featured=1 as featured, height, image, length, name, price, weight, width from Product where featured=true', function(err, records){
-		  if(err) throw err;
-		  httpRes.json(records);
-		});
-	} else if (req.query.keyword != null){
-		dbconn.query('select sku, availability, description, featured=1 as featured, height, image, length, name, price, weight, width from Product where SKU in (select SKU from PRODUCT_KEYWORD where Keyword = ?)', req.query.keyword, function(err, records){
-		  if(err) throw err;
-		  httpRes.json(records);
-		});
-	} 
+	pool.getConnection(function(err, conn) {
+		if (req.query.featured != null) {
+			conn.query('select sku, availability, description, featured=1 as featured, height, image, length, name, price, weight, width from Product where featured=true', function(err, records) {
+				if(err) throw err;
+				httpRes.json(records);
+			});
+		} else if (req.query.keyword != null){
+			conn.query('select sku, availability, description, featured=1 as featured, height, image, length, name, price, weight, width from Product where SKU in (select SKU from PRODUCT_KEYWORD where Keyword = ?)', req.query.keyword, function(err, records) {
+				if(err) throw err;
+				httpRes.json(records);
+			});
 
-	dbconn.end(function(err) {
-	    console.log('Database connection is end');
+		} 
+	    	conn.release();
 	});
 });
 
 
 //get based on sku #
 app.get('/product/products/:sku', function(req, httpRes) {
-
-	var dbconn = mysql.createConnection({
-	  host     : dbHost,
-	  user     : dbUser,
-	  password : dbPassword,
-	  database : dbDatabase
+	pool.getConnection(function(err, conn) {
+		conn.query('select sku, availability, description, featured=1 as featured, height, image, length, name, price, weight, width from Product where SKU = ? ', req.params.sku, function(err, records) {
+			if(err) throw err;
+			httpRes.json(records[0]);
+		});
+	    	conn.release();
 	});
-	dbconn.connect(function(err){
-	  if(err){
-	    console.log('Database connection error');
-	  }else{
-	    console.log('Database connection successful');
-	  }
-	});
-
-	dbconn.query('select sku, availability, description, featured=1 as featured, height, image, length, name, price, weight, width from Product where SKU = ? ', req.params.sku, function(err, records){
-	  if(err) throw err;
-	  httpRes.json(records[0]);
-	});
-
-	dbconn.end(function(err) {
-	    console.log('Database connection is end');
-	});
-
 });
 
 
 //add keyword through post 
 app.post('/product/keywords', function(req, httpRes) {
-
-	var dbconn = mysql.createConnection({
-	  host     : dbHost,
-	  user     : dbUser,
-	  password : dbPassword,
-	  database : dbDatabase
-	});
-	dbconn.connect(function(err){
-	  if(err){
-	    console.log('Database connection error');
-	  }else{
-	    console.log('Database connection successful');
-	  }
-	});
-
 	var record= { KEYWORD: req.body.keyword};
-
-	dbconn.query('INSERT INTO Keyword SET ?', record, function(err,dbRes){
-	  if(err) throw err;
-		var result = {
-			keyword : req.body.keyword,
-  			products : null}
-
-	  httpRes.json(result);
-	});
-
-	dbconn.end(function(err) {
-	    console.log('Database connection is end');
+	pool.getConnection(function(err, conn) {
+		conn.query('INSERT INTO Keyword SET ?', record, function(err, records) {
+			if(err) throw err;
+			var result = {
+				keyword : req.body.keyword,
+  				products : null}
+	  		httpRes.json(result);
+		});
+	    	conn.release();
 	});
 
 });
@@ -129,140 +85,121 @@ app.post('/product/keywords', function(req, httpRes) {
 
 //add product through post 
 app.post('/product/products', function(req, httpRes) {
-	var dbconn = mysql.createConnection({
-	  host     : dbHost,
-	  user     : dbUser,
-	  password : dbPassword,
-	  database : dbDatabase
-	});
+
+	pool.getConnection(function(err, dbconn) {
 
 
-	dbconn.connect(function(err){
-	  if(err){
-	    console.log('Database connection error');
-	  }else{
-	    console.log('Database connection successful');
-	  }
-	});
+		/* Begin transaction */
+		dbconn.beginTransaction(function(err) {
+		  	if (err) { throw err; }
 
+			var featured = 0;
+			if (req.body.featured = 'true') 
+				featured = 1;
 
-	/* Begin transaction */
-	dbconn.beginTransaction(function(err) {
-	  	if (err) { throw err; }
+			var record= { DESCRIPTION: req.body.description, HEIGHT: req.body.height, LENGTH: req.body.length,  NAME: req.body.name, WEIGHT: req.body.weight, WIDTH: req.body.width, FEATURED: featured, 	AVAILABILITY: req.body.availability, IMAGE: req.body.image, PRICE: req.body.price};
 
-		var featured = 0;
-		if (req.body.featured = 'true') 
-			featured = 1;
+			dbconn.query('INSERT INTO Product SET ?', record, function(err,dbRes){
+		    		if (err) { 
+		      			dbconn.rollback(function() {
+					throw err;
+		      			});
+		    		}
 
-		var record= { DESCRIPTION: req.body.description, HEIGHT: req.body.height, LENGTH: req.body.length,  NAME: req.body.name, WEIGHT: req.body.weight, WIDTH: req.body.width, FEATURED: featured, 	AVAILABILITY: req.body.availability, IMAGE: req.body.image, PRICE: req.body.price};
+				var tmpSku = dbRes.insertId;
+		 		record = {KEYWORD: req.body.image, SKU: tmpSku};
 
-		dbconn.query('INSERT INTO Product SET ?', record, function(err,dbRes){
-	    		if (err) { 
-	      			dbconn.rollback(function() {
-				throw err;
-	      			});
-	    		}
-
-			var tmpSku = dbRes.insertId;
-	 		record = {KEYWORD: req.body.image, SKU: tmpSku};
-
-			dbconn.query('INSERT INTO PRODUCT_KEYWORD SET ?', record, function(err,dbRes){
-		      		if (err) { 
-					dbconn.rollback(function() {
-			  		throw err;
-					});
-		      		}  
-				console.log('record insert into PRODUCT_KEYWORD table');
-			      	dbconn.commit(function(err) {
+				dbconn.query('INSERT INTO PRODUCT_KEYWORD SET ?', record, function(err,dbRes){
 			      		if (err) { 
 						dbconn.rollback(function() {
 				  		throw err;
 						});
-		      			}  
-				console.log('inserted into both Product and PRODUCT_KEYWORD tables in one transcation ');
+			      		}  
+					console.log('record insert into PRODUCT_KEYWORD table');
+				      	dbconn.commit(function(err) {
+				      		if (err) { 
+							dbconn.rollback(function() {
+					  		throw err;
+							});
+			      			}  
+					console.log('inserted into both Product and PRODUCT_KEYWORD tables in one transcation ');
 
-				var result = {
-					sku : tmpSku,
-				  	name : req.body.name,
-					description : req.body.description,
-					length : req.body.length,
-					width : req.body.width, 
-					height : req.body.height,
-					weight : req.body.weight,
-					featured : req.body.featured, 
-					availability : req.body.availability,
-					price : req.body.price, 
-					image : req.body.image
-					};
+					var result = {
+						sku : tmpSku,
+					  	name : req.body.name,
+						description : req.body.description,
+						length : req.body.length,
+						width : req.body.width, 
+						height : req.body.height,
+						weight : req.body.weight,
+						featured : req.body.featured, 
+						availability : req.body.availability,
+						price : req.body.price, 
+						image : req.body.image
+						};
 
-	  			httpRes.json(result);
-				dbconn.end(function(err) {
-				    console.log('Database connection is end');
-				});
-		      		}); //end commit
-	    		}); //end 2nd query
-	  	}); //end 1st query
-	});
-	/* End transaction */
+		  			httpRes.json(result);
+
+			      		}); //end commit
+		    		}); //end 2nd query
+		  	}); //end 1st query
+		});
+		/* End transaction */
+
+	    	dbconn.release();
+	});//end pool.getConnection
 });
 
 //reduce product through post, this is for the checkout process 
 app.post('/product/reduce', function(req, httpRes) {
-
 	var array = req.body.length;
 
-
-	var dbconn = mysql.createConnection({
-	  host     : dbHost,
-	  user     : dbUser,
-	  password : dbPassword,
-	  database : dbDatabase
-	});
-
-
 	var sendReply = false;
-	for (var i = 0; i < req.body.length; i++) {
-		if(!req.body[i].hasOwnProperty('sku') || !req.body[i].hasOwnProperty('quantity')) {
-			httpRes.statusCode = 400;
-			return httpRes.send('Error 400: need to have valid sku and quantity.');
+	
+	pool.getConnection(function(err, conn) {
+		for (var i = 0; i < req.body.length; i++) {
+			if(!req.body[i].hasOwnProperty('sku') || !req.body[i].hasOwnProperty('quantity')) {
+				httpRes.statusCode = 400;
+				return httpRes.send('Error 400: need to have valid sku and quantity.');
+			}
+
+			var tmpSku = req.body[i]['sku'];
+			var tmpQuantity = req.body[i]['quantity'];
+			var sqlStr = 'update Product set availability = availability - ' + tmpQuantity + ' where sku = ' + tmpSku + ' and availability - ' + tmpQuantity + ' > 0'; 
+			console.log('reduce tmpSku:' + tmpSku);
+			console.log('reduce tmpQuantity:' + tmpQuantity);
+			console.log('reduce sqlStr: ' + sqlStr);
+
+			conn.query(sqlStr, function(err, result) {
+				if(err) throw err;
+
+			  	if (result.affectedRows > 0) {
+					console.log('reduced from Product ' + result.affectedRows + ' rows');
+			  	} else {
+					var result = [
+					  { message : 'Insufficient availability for ' + tmpSku,
+					  details : null}
+					];
+					if (sendReply == false) {
+						httpRes.json(result);
+						sendReply = true;
+					}
+
+			  	}
+			});
+
+
 		}
-
-
-		var tmpSku = req.body[i]['sku'];
-		var tmpQuantity = req.body[i]['quantity'];
-		var sqlStr = 'update Product set availability = availability - ' + tmpQuantity + ' where sku = ' + tmpSku + ' and availability - ' + tmpQuantity + ' > 0'; 
-
-		dbconn.query(sqlStr, function(err, result){
-			if(err) throw err;
-
-		  	if (result.affectedRows > 0) {
-				console.log('reduced from Product ' + result.affectedRows + ' rows');
-		  	} else {
-				var result = [
-				  { message : 'Insufficient availability for ' + tmpSku,
-				  details : null}
-				];
-				if (sendReply == false) {
-					httpRes.json(result);
-					sendReply = true;
-				}
-
-		  	}
-		});
-
-	}
-
-	dbconn.end(function(err) {
-	    console.log('Database connection is end');
+    		conn.release();
 	});
-
 	return httpRes.send('');;
 });
+
 
 //classify method for adding demo
 app.post('/product/classify/:sku', function(req, httpRes) {
 	console.log( "Asked to classify " + req.params.sku );
-	  httpRes.json('');
+	httpRes.json('');
 });
 
 
@@ -270,55 +207,43 @@ app.post('/product/classify/:sku', function(req, httpRes) {
 //delete based on sku #
 app.delete('/product/products/:sku', function(req, httpRes) {
 
-	var dbconn = mysql.createConnection({
-	  host     : dbHost,
-	  user     : dbUser,
-	  password : dbPassword,
-	  database : dbDatabase
-	});
-	dbconn.connect(function(err){
-	  if(err){
-	    console.log('Database connection error');
-	  }else{
-	    console.log('Database connection successful');
-	  }
-	});
+	pool.getConnection(function(err, dbconn) {
 
-
-	/* Begin transaction */
-	dbconn.beginTransaction(function(err) {
-	  	if (err) { throw err; }
-	  	dbconn.query('DELETE FROM PRODUCT_KEYWORD where SKU = ?', req.params.sku, function(err, result){
-	    		if (err) { 
-	      			dbconn.rollback(function() {
-				throw err;
-	      			});
-	    		}
-		console.log('deleted from PRODUCT_KEYWORD ' + result.affectedRows + ' rows');
-	 
-		dbconn.query('DELETE FROM Product where SKU = ?', req.params.sku, function(err, result){
-	      		if (err) { 
-				dbconn.rollback(function() {
-		  		throw err;
-				});
-	      		}  
-			console.log('deleted from Product ' + result.affectedRows + ' rows');
-		      	dbconn.commit(function(err) {
+		/* Begin transaction */
+		dbconn.beginTransaction(function(err) {
+		  	if (err) { throw err; }
+		  	dbconn.query('DELETE FROM PRODUCT_KEYWORD where SKU = ?', req.params.sku, function(err, result){
+		    		if (err) { 
+		      			dbconn.rollback(function() {
+					throw err;
+		      			});
+		    		}
+			console.log('deleted from PRODUCT_KEYWORD ' + result.affectedRows + ' rows');
+		 
+			dbconn.query('DELETE FROM Product where SKU = ?', req.params.sku, function(err, result){
 		      		if (err) { 
 					dbconn.rollback(function() {
 			  		throw err;
 					});
 		      		}  
-				console.log('Transaction Complete.');
-	  			httpRes.json('deleted from both Product and PRODUCT_KEYWORD tables in one transcation');
-				dbconn.end(function(err) {
-				    console.log('Database connection is end');
-				});
-		      	}); //end commit
-	    	}); //end 2nd query
-	  }); //end 1st query
-	});
-	/* End transaction */
+				console.log('deleted from Product ' + result.affectedRows + ' rows');
+			      	dbconn.commit(function(err) {
+			      		if (err) { 
+						dbconn.rollback(function() {
+				  		throw err;
+						});
+			      		}  
+					console.log('Transaction Complete.');
+		  			httpRes.json('deleted from both Product and PRODUCT_KEYWORD tables in one transcation');
+
+			      	}); //end commit
+		    	}); //end 2nd query
+		  }); //end 1st query
+		});
+		/* End transaction */
+
+	    	dbconn.release();
+	});//end pool.getConnection
 });
 
 //put (update) based on sku #
@@ -334,20 +259,6 @@ app.patch('/product/products/:sku', function(req, res) {
 
 //real update function works for both put and patch request
 function updateProduct(skuIn, req, httpRes) {
-
-	var dbconn = mysql.createConnection({
-	  host     : dbHost,
-	  user     : dbUser,
-	  password : dbPassword,
-	  database : dbDatabase
-	});
-	dbconn.connect(function(err){
-	  if(err){
-	    console.log('Database connection error');
-	  }else{
-	    console.log('Database connection successful');
-	  }
-	});
 
 	var sqlStr0 = 'UPDATE Product SET '; 
 	var sqlStr = ''; 
@@ -394,19 +305,30 @@ function updateProduct(skuIn, req, httpRes) {
     	console.log('!!!!!SQL ready to be executed: ' + sqlStr);
 
 
-	dbconn.query(sqlStr, skuIn, function(err, result){
-	  if(err) throw err;
-		console.log('update Product table' + result.affectedRows + ' rows');
+	pool.getConnection(function(err, conn) {
+		conn.query(sqlStr, skuIn, function(err, result) {
+			if(err) throw err;
+			console.log('update Product table' + result.affectedRows + ' rows');
+		});
+	    	conn.release();
 	});
 
   	httpRes.json('Update Product table');
-
-	dbconn.end(function(err) {
-	    console.log('Database connection is end');
-	});
-
 }
 
+//close connection pool when detected ctrl-c command
+process.on('SIGINT', function() {
+    	console.log("Caught interrupt signal");
+
+    	pool.end(function (err) {
+	    	console.log("Closed connection pool");
+	        process.exit();
+	});
+
+});
 
 
 app.listen(process.env.PORT || 8080);
+
+
+
