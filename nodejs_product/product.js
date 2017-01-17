@@ -5,10 +5,11 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
 
-const dbHost = process.env.MYSQL_HOST,
-      dbUser = process.env.MYSQL_USER,
-      dbDatabase = process.env.MYSQL_DATABASE,
-      dbPassword = process.env.MYSQL_PASSWORD;
+const dbUser = process.env.MYSQL_USER;
+const dbPassword = process.env.MYSQL_PASSWORD;
+
+var dbHost = process.env.MYSQL_HOST;
+var dbDatabase = process.env.MYSQL_DATABASE;
 
 if (dbHost == null) dbHost = 'product-db';
 if (dbDatabase == null) dbDatabase = 'product';
