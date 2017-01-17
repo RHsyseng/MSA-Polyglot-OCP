@@ -1,11 +1,11 @@
-var express = require('express');
-var app     = express();
-var bodyParser = require('body-parser');
+const express = require('express');
+const app     = express();
+const bodyParser = require('body-parser');
 
 app.use(bodyParser.json());
 
 
-var dbHost = process.env.MYSQL_HOST,
+const dbHost = process.env.MYSQL_HOST,
       dbUser = process.env.MYSQL_USER,
       dbDatabase = process.env.MYSQL_DATABASE,
       dbPassword = process.env.MYSQL_PASSWORD;
@@ -18,8 +18,8 @@ console.log('!!!!!!!!!!!!!!!!!!!!!!dbPassword ' + dbPassword);
 console.log('!!!!!!!!!!!!!!!!!!!!!!dbDatabase ' + dbDatabase);
 console.log('!!!!!!!!!!!!!!!!!!!!!!dbHost ' + dbHost);
 
-var mysql  = require('mysql');
-var pool = mysql.createPool({
+const mysql  = require('mysql');
+const pool = mysql.createPool({
   connectionLimit : 5,
   host            : dbHost,
   user            : dbUser,
@@ -68,11 +68,11 @@ app.get('/product/products/:sku', function(req, httpRes) {
 
 //add keyword through post 
 app.post('/product/keywords', function(req, httpRes) {
-	var record= { KEYWORD: req.body.keyword};
+	const record= { KEYWORD: req.body.keyword};
 	pool.getConnection(function(err, conn) {
 		conn.query('INSERT INTO Keyword SET ?', record, function(err, records) {
 			if(err) throw err;
-			var result = {
+			const result = {
 				keyword : req.body.keyword,
   				products : null}
 	  		httpRes.json(result);
@@ -85,19 +85,19 @@ app.post('/product/keywords', function(req, httpRes) {
 
 //add product through post 
 app.post('/product/products', function(req, httpRes) {
-
+	//To use "let" need strict mode in node version 4.*
+	"use strict";
 	pool.getConnection(function(err, dbconn) {
-
 
 		/* Begin transaction */
 		dbconn.beginTransaction(function(err) {
 		  	if (err) { throw err; }
 
-			var featured = 0;
+			let featured = 0;
 			if (req.body.featured = 'true') 
 				featured = 1;
 
-			var record= { DESCRIPTION: req.body.description, HEIGHT: req.body.height, LENGTH: req.body.length,  NAME: req.body.name, WEIGHT: req.body.weight, WIDTH: req.body.width, FEATURED: featured, 	AVAILABILITY: req.body.availability, IMAGE: req.body.image, PRICE: req.body.price};
+			let record= { DESCRIPTION: req.body.description, HEIGHT: req.body.height, LENGTH: req.body.length,  NAME: req.body.name, WEIGHT: req.body.weight, WIDTH: req.body.width, FEATURED: featured, 	AVAILABILITY: req.body.availability, IMAGE: req.body.image, PRICE: req.body.price};
 
 			dbconn.query('INSERT INTO Product SET ?', record, function(err,dbRes){
 		    		if (err) { 
@@ -106,7 +106,7 @@ app.post('/product/products', function(req, httpRes) {
 		      			});
 		    		}
 
-				var tmpSku = dbRes.insertId;
+				const tmpSku = dbRes.insertId;
 		 		record = {KEYWORD: req.body.image, SKU: tmpSku};
 
 				dbconn.query('INSERT INTO PRODUCT_KEYWORD SET ?', record, function(err,dbRes){
@@ -124,7 +124,7 @@ app.post('/product/products', function(req, httpRes) {
 			      			}  
 					console.log('inserted into both Product and PRODUCT_KEYWORD tables in one transcation ');
 
-					var result = {
+					const result = {
 						sku : tmpSku,
 					  	name : req.body.name,
 						description : req.body.description,
@@ -152,20 +152,19 @@ app.post('/product/products', function(req, httpRes) {
 
 //reduce product through post, this is for the checkout process 
 app.post('/product/reduce', function(req, httpRes) {
-	var array = req.body.length;
-
-	var sendReply = false;
+	"use strict";
+	let sendReply = false;
 	
 	pool.getConnection(function(err, conn) {
-		for (var i = 0; i < req.body.length; i++) {
+		for (let i = 0; i < req.body.length; i++) {
 			if(!req.body[i].hasOwnProperty('sku') || !req.body[i].hasOwnProperty('quantity')) {
 				httpRes.statusCode = 400;
 				return httpRes.send('Error 400: need to have valid sku and quantity.');
 			}
 
-			var tmpSku = req.body[i]['sku'];
-			var tmpQuantity = req.body[i]['quantity'];
-			var sqlStr = 'update Product set availability = availability - ' + tmpQuantity + ' where sku = ' + tmpSku + ' and availability - ' + tmpQuantity + ' > 0'; 
+			const tmpSku = req.body[i]['sku'];
+			const tmpQuantity = req.body[i]['quantity'];
+			const sqlStr = 'update Product set availability = availability - ' + tmpQuantity + ' where sku = ' + tmpSku + ' and availability - ' + tmpQuantity + ' > 0'; 
 			console.log('reduce tmpSku:' + tmpSku);
 			console.log('reduce tmpQuantity:' + tmpQuantity);
 			console.log('reduce sqlStr: ' + sqlStr);
@@ -176,7 +175,7 @@ app.post('/product/reduce', function(req, httpRes) {
 			  	if (result.affectedRows > 0) {
 					console.log('reduced from Product ' + result.affectedRows + ' rows');
 			  	} else {
-					var result = [
+					const result = [
 					  { message : 'Insufficient availability for ' + tmpSku,
 					  details : null}
 					];
@@ -259,9 +258,8 @@ app.patch('/product/products/:sku', function(req, res) {
 
 //real update function works for both put and patch request
 function updateProduct(skuIn, req, httpRes) {
-
-	var sqlStr0 = 'UPDATE Product SET '; 
-	var sqlStr = ''; 
+	"use strict";
+	let sqlStr = ''; 
 	if (req.body.DESCRIPTION != null){
 		sqlStr = 'DESCRIPTION = \'' + req.body.DESCRIPTION + "\'";
 	}
@@ -301,7 +299,7 @@ function updateProduct(skuIn, req, httpRes) {
 		if (sqlStr !='') sqlStr = sqlStr + " , ";
 		sqlStr = sqlStr + 'PRICE = \'' + req.body.PRICE + "\'";
 	}
-	sqlStr = sqlStr0 + sqlStr + ' WHERE SKU = ?';
+	sqlStr = 'UPDATE Product SET ' + sqlStr + ' WHERE SKU = ?';
     	console.log('!!!!!SQL ready to be executed: ' + sqlStr);
 
 
