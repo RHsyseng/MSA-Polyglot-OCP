@@ -90,7 +90,7 @@ app.post('/product/products', function(req, httpRes) {
 	"use strict";
 	pool.getConnection(function(err, dbconn) {
 
-		/* Begin transaction */
+		// Begin transaction
 		dbconn.beginTransaction(function(err) {
 		  	if (err) { throw err; }
 
@@ -145,7 +145,7 @@ app.post('/product/products', function(req, httpRes) {
 		    		}); //end 2nd query
 		  	}); //end 1st query
 		});
-		/* End transaction */
+		// End transaction
 
 	    	dbconn.release();
 	});//end pool.getConnection
@@ -209,7 +209,7 @@ app.delete('/product/products/:sku', function(req, httpRes) {
 
 	pool.getConnection(function(err, dbconn) {
 
-		/* Begin transaction */
+		// Begin transaction
 		dbconn.beginTransaction(function(err) {
 		  	if (err) { throw err; }
 		  	dbconn.query('DELETE FROM PRODUCT_KEYWORD where SKU = ?', req.params.sku, function(err, result){
@@ -240,7 +240,7 @@ app.delete('/product/products/:sku', function(req, httpRes) {
 		    	}); //end 2nd query
 		  }); //end 1st query
 		});
-		/* End transaction */
+		// End transaction
 
 	    	dbconn.release();
 	});//end pool.getConnection
